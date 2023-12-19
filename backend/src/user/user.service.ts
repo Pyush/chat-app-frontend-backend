@@ -14,16 +14,20 @@ export class UserService {
   async create(newUser: User): Promise<User> {
     try {
       const exists: boolean = await this.mailExists(newUser.email);
+      console.log(exists);
       if (!exists) {
         const passwordHash: string = await this.hashPassword(newUser.password);
         newUser.password = passwordHash;
         const user = new this.userModel(newUser);
-        return user.save();
+        return await user.save();
       } else {
         throw new HttpException('Email is already in use', HttpStatus.CONFLICT);
       }
-    } catch {
-      throw new HttpException('Email is already in use', HttpStatus.CONFLICT);
+    } catch (e) {
+      throw new HttpException(
+        JSON.stringify(e),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -36,7 +40,7 @@ export class UserService {
           foundUser.password,
         );
         if (matches) {
-          const payload: User = await this.findOne(foundUser.id);
+          const payload: User = await this.findOne(foundUser._id);
           return this.authService.generateJwt(payload);
         } else {
           throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
