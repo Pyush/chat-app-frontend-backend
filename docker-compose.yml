@@ -7,9 +7,9 @@ services:
     depends_on: 
       - database
     environment:
-      DATABASE_URL: http://localhost:27027/chatAppDB
+      DATABASE_URL: mongodb://localhost:27027/chatAppDB
       NODE_ENV: development
-      JWT_SECRET: piyush_123
+      JWT_SECRET: piyush@123
       PORT: 3000
     ports:
       - 3000:3000

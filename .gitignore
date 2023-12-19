@@ -35,6 +35,7 @@
 ./Backend/!.vscode/tasks.json
 ./Backend/!.vscode/launch.json
 ./Backend/!.vscode/extensions.json
+./Backend/.env
 
 #Frontend
 
