@@ -34,14 +34,16 @@ export class UserService {
   async login(user: UserDTO): Promise<string> {
     try {
       const foundUser: User = await this.findByEmail(user.email.toLowerCase());
+      console.log(foundUser);
       if (foundUser) {
         const matches: boolean = await this.validatePassword(
           user.password,
           foundUser.password,
         );
         if (matches) {
-          const payload: User = await this.findOne(foundUser._id);
-          return this.authService.generateJwt(payload);
+          console.log(matches);
+          console.log(foundUser._id);
+          return this.authService.generateJwt(foundUser);
         } else {
           throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
         }
@@ -79,12 +81,12 @@ export class UserService {
     return this.authService.comparePasswords(password, storedPasswordHash);
   }
 
-  private async findOne(id: string): Promise<User> {
-    return this.userModel.findOne({ id: new Types.ObjectId(id) });
+  private async findOne(id: Types.ObjectId): Promise<User> {
+    return this.userModel.findOne({ id: id });
   }
 
-  public getOne(id: number): Promise<User> {
-    return this.userModel.findOne({ id: new Types.ObjectId(id) });
+  public getOne(id: Types.ObjectId): Promise<User> {
+    return this.userModel.findOne({ id: id });
   }
 
   private async mailExists(email: string): Promise<boolean> {

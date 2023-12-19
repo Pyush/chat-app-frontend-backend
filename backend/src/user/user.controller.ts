@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { User, UserDTO } from './schemas/user.schema';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
 
 @Controller('user')
 export class UserController {
@@ -14,11 +15,13 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   async findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
 
   @Get('/find-by-username')
+  @UseGuards(JwtAuthGuard)
   async findAllByUsername(@Query('username') username: string) {
     return this.userService.findAllByUsername(username);
   }

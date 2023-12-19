@@ -7,8 +7,8 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  async generateJwt(user: User): Promise<string> {
-    return this.jwtService.signAsync({ user });
+  async generateJwt(user: any): Promise<string> {
+    return this.jwtService.sign({ user }, { expiresIn: '7d' });
   }
 
   async hashPassword(password: string): Promise<string> {

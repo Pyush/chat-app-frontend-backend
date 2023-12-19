@@ -14,11 +14,12 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
         signOptions: { expiresIn: '7d' },
+        verifyOptions: { ignoreExpiration: true },
       }),
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard],
-  exports: [AuthService],
+  exports: [JwtStrategy, AuthService],
 })
 export class AuthModule {}

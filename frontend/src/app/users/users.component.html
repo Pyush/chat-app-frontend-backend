@@ -1,0 +1,16 @@
+<div class="w3-container">
+  <h2>User List</h2>
+  <p></p>
+  <ul class="w3-ul w3-card-4">
+    <ng-container *ngFor="let user of users">
+      <li class="w3-bar" (click)="gotoChat(user)">
+        <div class="w3-bar-item">
+          <span class="w3-large">{{ user.username }}</span
+          ><br />
+          <span>{{ user.email }}</span><br />
+          <span *ngIf="checkYou(user)">You</span>
+        </div>
+      </li>
+    </ng-container>
+  </ul>
+</div>

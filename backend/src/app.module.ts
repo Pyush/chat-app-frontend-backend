@@ -18,7 +18,7 @@ import { AuthMiddleware } from './utilities/middleware/auth.middleware';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB),
+    MongooseModule.forRoot(process.env.DATABASE_URL),
     ChatModule,
     AuthModule,
     UserModule,
@@ -26,14 +26,16 @@ import { AuthMiddleware } from './utilities/middleware/auth.middleware';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .exclude(
-        { path: '/user', method: RequestMethod.POST },
-        { path: '/user/login', method: RequestMethod.POST },
-      )
-      .forRoutes('');
-  }
-}
+export class AppModule {}
+
+// implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(AuthMiddleware)
+//       .exclude(
+//         { path: '/user', method: RequestMethod.POST },
+//         { path: '/user/login', method: RequestMethod.POST },
+//       )
+//       .forRoutes('');
+//   }
+// }
