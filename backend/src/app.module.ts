@@ -1,10 +1,39 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
+import { ChatModule } from './chat/chat.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { AuthMiddleware } from './utilities/middleware/auth.middleware';
 
 @Module({
-  imports: [],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    MongooseModule.forRoot(process.env.MONGODB),
+    ChatModule,
+    AuthModule,
+    UserModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude(
+        { path: '/user', method: RequestMethod.POST },
+        { path: '/user/login', method: RequestMethod.POST },
+      )
+      .forRoutes('');
+  }
+}
