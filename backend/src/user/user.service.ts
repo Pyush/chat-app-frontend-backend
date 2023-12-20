@@ -14,7 +14,6 @@ export class UserService {
   async create(newUser: User): Promise<User> {
     try {
       const exists: boolean = await this.mailExists(newUser.email);
-      console.log(exists);
       if (!exists) {
         const passwordHash: string = await this.hashPassword(newUser.password);
         newUser.password = passwordHash;
@@ -34,15 +33,12 @@ export class UserService {
   async login(user: UserDTO): Promise<string> {
     try {
       const foundUser: User = await this.findByEmail(user.email.toLowerCase());
-      console.log(foundUser);
       if (foundUser) {
         const matches: boolean = await this.validatePassword(
           user.password,
           foundUser.password,
         );
         if (matches) {
-          console.log(matches);
-          console.log(foundUser._id);
           return this.authService.generateJwt(foundUser);
         } else {
           throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
