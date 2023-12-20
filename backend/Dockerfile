@@ -37,7 +37,7 @@ COPY package*.json ./
 
 RUN npm install --legacy-peer-deps
 
-ENV DATABASE_URL mongodb://piyush:Piyush123@localhost:27027/chatAppDB
+ENV DATABASE_URL mongodb://localhost:27017/chatAppDB
 ENV NODE_ENV development
 ENV JWT_SECRET piyush@123
 

@@ -18,7 +18,7 @@ import { AuthMiddleware } from './utilities/middleware/auth.middleware';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.DATABASE_URL),
+    MongooseModule.forRoot('mongodb://localhost:27017/chatAppDB'),
     ChatModule,
     AuthModule,
     UserModule,
