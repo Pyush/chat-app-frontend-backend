@@ -15,10 +15,12 @@ import { ChatDTO } from './schemas/chat.schema';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/schemas/user.schema';
+import { Types } from 'mongoose';
 
 const options = {
   cors: {
-    origin: '*',
+    origin: 'http://localhost:4200',
+    credentials: true,
   },
 };
 @WebSocketGateway(options)
@@ -29,7 +31,7 @@ export class ChatGateway
 
   @WebSocketServer() server: Server;
 
-  socketId: any[] = [];
+  socketIds: any[] = [];
 
   constructor(
     private readonly chatService: ChatService,
@@ -38,27 +40,27 @@ export class ChatGateway
   ) {}
 
   async onModuleInit() {
-    this.socketId = [];
+    this.logger.debug(`Socket Server onModuleInit`);
+    this.socketIds = [];
   }
 
   async handleConnection(client: any, ...args: any[]) {
     this.logger.debug(`${client.id} is connected...`);
     try {
       const decodedToken = await this.authService.verifyJwt(
-        client.handshake.headers.authorization,
+        client.handshake.query?.token,
       );
-      const user: User = await this.userService.getOne(decodedToken.user.id);
-      if (!user) {
+      if (!decodedToken.user) {
         return this.disconnect(client);
       } else {
-        client.data.user = user;
+        // client.data.user = user;
 
         // Save connection
-        this.socketId.push({ socketId: client.id, user });
+        this.socketIds.push({ socketId: client.id, user: decodedToken.user });
         // Only emit online to the specific connected client
-        for (let index = 0; index < this.socketId.length; index++) {
-          const element = this.socketId[index];
-          this.server.to(element.socketId).emit('online', user);
+        for (let index = 0; index < this.socketIds.length; index++) {
+          const element = this.socketIds[index];
+          this.server.to(element.socketId).emit('online', decodedToken.user);
         }
         return 'success';
       }
@@ -68,18 +70,18 @@ export class ChatGateway
   }
   handleDisconnect(client: any) {
     this.logger.debug(`${client.id} is disconnected...`);
-    const findIndex = this.socketId.findIndex(
+    const findIndex = this.socketIds.findIndex(
       (obj) => obj.socketId === client.id,
     );
     if (findIndex !== -1) {
-      const user = this.socketId[findIndex].user;
-      for (let index = 0; index < this.socketId.length; index++) {
-        const element = this.socketId[index];
+      const user = this.socketIds[findIndex].user;
+      for (let index = 0; index < this.socketIds.length; index++) {
+        const element = this.socketIds[index];
         if (element.user._id !== user._id) {
           this.server.to(element.socketId).emit('offline', user);
         }
       }
-      this.socketId.splice(findIndex, 1);
+      this.socketIds.splice(findIndex, 1);
     }
   }
   afterInit(server: any) {
@@ -97,5 +99,22 @@ export class ChatGateway
     @MessageBody() payload: ChatDTO,
   ): Promise<void> {
     this.logger.debug(`${client.id} messageSend ${JSON.stringify(payload)}`);
+
+    const messageData = {
+      from: payload.from,
+      to: payload.to,
+      message: payload.message,
+    } as ChatDTO;
+    const res = await this.chatService.create(messageData);
+
+    console.log(this.socketIds);
+    const findIndex = this.socketIds.findIndex(
+      (obj) => obj.user.email === messageData.to,
+    );
+    console.log('findIndex', findIndex);
+    if (findIndex !== -1) {
+      const userTo = this.socketIds[findIndex];
+      this.server.to(userTo.socketId).emit('messageReceive', res);
+    }
   }
 }
