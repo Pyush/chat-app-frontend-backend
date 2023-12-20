@@ -1,16 +1,7 @@
 version: "3.7"
 
 services:
-  # start the mongodb service as container
-  database:
-    image: mongo:6.0
-    container_name: mongodb
-    restart: always
-    ports:
-      - '27027:27017'
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: piyush
-      MONGO_INITDB_ROOT_PASSWORD: Piyush123
+  
   # Our NestJS Api
   api:
     build: ./backend
@@ -33,5 +24,16 @@ services:
       - 4200:80
     links:
       - api
+
+  # start the mongodb service as container
+  database:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - '27027:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: piyush
+      MONGO_INITDB_ROOT_PASSWORD: Piyush123
 
   
