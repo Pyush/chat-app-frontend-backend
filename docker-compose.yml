@@ -1,29 +1,6 @@
 version: "3.7"
 
 services:
-  # Our NestJS Api
-  api:
-    build: ./backend
-    depends_on: 
-      - database
-    environment:
-      DATABASE_URL: mongodb://localhost:27027/chatAppDB
-      NODE_ENV: development
-      JWT_SECRET: piyush@123
-      PORT: 3000
-    ports:
-      - 3000:3000
-    links:
-      - mongo
-  
-  # Our Angular Frontend
-  frontend:
-    build: ./frontend
-    ports:
-      - 4200:80
-    links:
-      - api
-
   # start the mongodb service as container
   database:
     image: mongo:6.0
@@ -34,3 +11,27 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: piyush
       MONGO_INITDB_ROOT_PASSWORD: Piyush@123
+  # Our NestJS Api
+  api:
+    build: ./backend
+    depends_on: 
+      - "database"
+    environment:
+      DATABASE_URL: mongodb://localhost:27027/chatAppDB
+      NODE_ENV: development
+      JWT_SECRET: piyush@123
+      PORT: 3000
+    ports:
+      - 3000:3000
+    links:
+      - "database"
+  
+  # Our Angular Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - 4200:80
+    links:
+      - api
+
+  

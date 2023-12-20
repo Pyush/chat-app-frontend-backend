@@ -9,7 +9,11 @@ WORKDIR /app
 COPY tsconfig*.json ./
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --legacy-peer-deps
+
+ENV DATABASE_URL mongodb://localhost:27027/chatAppDB
+ENV NODE_ENV development
+ENV JWT_SECRET piyush@123
 
 # Install dependencies from package-lock.json, see https://docs.npmjs.com/cli/v7/commands/npm-ci
 RUN npm ci
@@ -30,7 +34,11 @@ WORKDIR /app
 # Copy dependencies files
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --legacy-peer-deps
+
+ENV DATABASE_URL mongodb://localhost:27027/chatAppDB
+ENV NODE_ENV development
+ENV JWT_SECRET piyush@123
 
 # Install runtime dependecies (without dev/test dependecies)
 RUN npm ci --production
