@@ -1,3 +1,4 @@
+import { ChatService } from './../../../../backend/src/chat/chat.service';
 import { Component } from '@angular/core';
 
 @Component({
@@ -7,5 +8,6 @@ import { Component } from '@angular/core';
 })
 export class ChatComponent {
 
-  
+  constructor(private chatService: ChatService) { }
+
 }
