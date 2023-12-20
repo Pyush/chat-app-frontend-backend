@@ -12,6 +12,8 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
     credentials: true,
   });
+  console.log(process.env.DATABASE_URL);
+  console.log(process.env.JWT_SECRET);
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 }
